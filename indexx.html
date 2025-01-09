@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sharp Turns & Narrow Angles</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+    .sharp-turn {
+      background-color: red;
+      color: white;
+      padding: 2px 5px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    const map = L.map('map').setView([22.5, 87.7], 8);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Coordinates of the route
+    const routeCoordinates = [
+      [22.03743, 88.09920], // Point A: IOCL Haldia Terminal A
+      [23.0, 87.8],         // Intermediate point
+      [23.53814, 87.25042]  // Point B: NTPC SAIL Power Company Pvt. Ltd.
+    ];
+
+    // Draw the route
+    const route = L.polyline(routeCoordinates, { color: 'blue', weight: 4 }).addTo(map);
+
+    // Analyze sharp angles
+    function calculateAngle(latlng1, latlng2, latlng3) {
+      const toRadians = (deg) => deg * (Math.PI / 180);
+      const toDegrees = (rad) => rad * (180 / Math.PI);
+
+      const bearing1 = Math.atan2(
+        Math.sin(toRadians(latlng2[1] - latlng1[1])) * Math.cos(toRadians(latlng2[0])),
+        Math.cos(toRadians(latlng1[0])) * Math.sin(toRadians(latlng2[0])) -
+          Math.sin(toRadians(latlng1[0])) * Math.cos(toRadians(latlng2[0])) *
+          Math.cos(toRadians(latlng2[1] - latlng1[1]))
+      );
+
+      const bearing2 = Math.atan2(
+        Math.sin(toRadians(latlng3[1] - latlng2[1])) * Math.cos(toRadians(latlng3[0])),
+        Math.cos(toRadians(latlng2[0])) * Math.sin(toRadians(latlng3[0])) -
+          Math.sin(toRadians(latlng2[0])) * Math.cos(toRadians(latlng3[0])) *
+          Math.cos(toRadians(latlng3[1] - latlng2[1]))
+      );
+
+      const angle = toDegrees((bearing2 - bearing1 + 2 * Math.PI) % (2 * Math.PI));
+      return angle > 180 ? 360 - angle : angle;
+    }
+
+    for (let i = 1; i < routeCoordinates.length - 1; i++) {
+      const angle = calculateAngle(
+        routeCoordinates[i - 1],
+        routeCoordinates[i],
+        routeCoordinates[i + 1]
+      );
+
+      if (angle < 90) {
+        L.marker(routeCoordinates[i], {
+          icon: L.divIcon({
+            className: 'sharp-turn',
+            html: `&#x26A0; ${angle.toFixed(1)}°`
+          })
+        }).addTo(map);
+      }
+    }
+
+    map.fitBounds(route.getBounds());
+  </script>
+</body>
+</html>
