@@ -1,86 +1,461 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sharp Turns & Narrow Angles</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <style>
-    #map {
-      height: 100vh;
-      width: 100%;
-    }
-    .sharp-turn {
-      background-color: red;
-      color: white;
-      padding: 2px 5px;
-      border-radius: 5px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route List</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        /* Header Section */
+        header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+        }
+
+        header img {
+            display: block;
+            margin: 0 auto;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            margin: 5px 0 0;
+            font-size: 1.2rem;
+        }
+
+        /* Search Box */
+        .search-bar {
+            display: block;
+            width: 80%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 12px 15px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Route List */
+        .route-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            list-style: none;
+            margin: 0;
+        }
+
+        .route-item {
+            width: 300px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 15px 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .route-item a {
+            text-decoration: none;
+            color: #007bff;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .route-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer Section */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 0.9rem;
+        }
+
+        footer img {
+            display: block;
+            margin: 0 auto 5px;
+        }
+    </style>
 </head>
 <body>
-  <div id="map"></div>
-  <script>
-    const map = L.map('map').setView([22.5, 87.7], 8);
 
-    // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    <!-- Header with an Image -->
+    <header>
+        <img src="iocl logo.png" alt="Route Finder Logo" width="50">
+        <h1>IOCL CHITTOOR TERMINAL  </h1>
+        <p>JOURNEY RISK MANAGEMENT TOOL</p>
+    </header>
 
-    // Coordinates of the route
-    const routeCoordinates = [
-      [22.03743, 88.09920], // Point A: IOCL Haldia Terminal A
-      [23.0, 87.8],         // Intermediate point
-      [23.53814, 87.25042]  // Point B: NTPC SAIL Power Company Pvt. Ltd.
-    ];
+    <!-- Main Content Placeholder -->
+    <div style="padding: 20px; text-align: center;">
+        <p>Welcome to JRM tool ,start by searching for your desired RO/CONSUMER JRM below</p>
+    </div>
 
-    // Draw the route
-    const route = L.polyline(routeCoordinates, { color: 'blue', weight: 4 }).addTo(map);
+    <!-- Search Box -->
+    <input type="text" id="searchBox" class="search-bar" placeholder="Search for a route...">
 
-    // Analyze sharp angles
-    function calculateAngle(latlng1, latlng2, latlng3) {
-      const toRadians = (deg) => deg * (Math.PI / 180);
-      const toDegrees = (rad) => rad * (180 / Math.PI);
+    <!-- Route List -->
+    <ul class="route-list" id="routeList">
+        <!-- Route links will be generated dynamically -->
+    </ul>
 
-      const bearing1 = Math.atan2(
-        Math.sin(toRadians(latlng2[1] - latlng1[1])) * Math.cos(toRadians(latlng2[0])),
-        Math.cos(toRadians(latlng1[0])) * Math.sin(toRadians(latlng2[0])) -
-          Math.sin(toRadians(latlng1[0])) * Math.cos(toRadians(latlng2[0])) *
-          Math.cos(toRadians(latlng2[1] - latlng1[1]))
-      );
+    <!-- Footer with an Image -->
+    <footer>
+        <p>&copy; 2025 Route Finder. All rights reserved.</p>
+    </footer>
 
-      const bearing2 = Math.atan2(
-        Math.sin(toRadians(latlng3[1] - latlng2[1])) * Math.cos(toRadians(latlng3[0])),
-        Math.cos(toRadians(latlng2[0])) * Math.sin(toRadians(latlng3[0])) -
-          Math.sin(toRadians(latlng2[0])) * Math.cos(toRadians(latlng3[0])) *
-          Math.cos(toRadians(latlng3[1] - latlng2[1]))
-      );
+    <script>
+        // List of routes
+        const routes = [
+            "005500 ASST CONTROLLER OF STORES (Code - 508970)_3.html",
+"053077 LF S.C.RLY RENIGUNTA (Code - 505931)_3.html",
+"A.P.MIN.DEVLP.CORPN.(MANGAMPET (Code - 126826)_3.html",
+"ABEED BABAJEE FILLING STATION (Code - 216313)_3.html",
+"ADARSH PETRO PARK (Code - 326717)_3.html",
+"ADHOC -  GENERAL AGENCIES (Code - 367204)_3.html",
+"ADHOC KOORAPATI SERVICE STATION (Code - 368580)_3.html",
+"ADHOC P.V.R.FILLING STATION (Code - 358928)_3.html",
+"ADHOC SRI MALLIKARJUNA TRADERS (Code - 287078)_3.html",
+"AHMED & AHMED PETROLEUMS (Code - 127771)_3.html",
+"AMARA FILLING STATION (Code - 342684)_3.html",
+"AMARA RAJA INFRA PVT. LIMITED (Code - 305313)_3.html",
+"AMEER QUALITY FUELS (L-163) (Code - 152813)_3.html",
+"AMRUTA AGENCIES (L-103) (Code - 188005)_3.html",
+"ANUSHA SAI AGENCIES (L-88) (Code - 153633)_3.html",
+"AP PRISONS IOCL RETAIL OUTLET, DIST (Code - 349601)_3.html",
+"APCO INFRATECH PRIVATE LIMITED (Code - 346822)_3.html",
+"APSRTC - PRODDATUR (Code - 504670)_3.html",
+"APSRTC MANGALAM (Code - 538030)_3.html",
+"APSRTC-CHITTOOR - I (Code - 504577)_3.html",
+"APSRTC-CHITTOOR-II (Code - 509065)_3.html",
+"APSRTC-TIRUMALA (Code - 504690)_3.html",
+"B N S R FILLING STATION KSK (Code - 285501)_3.html",
+"B.J.REDDY FILLING STATION (Code - 242006)_3.html",
+"B.M.REDDY FILLING STATION (Code - 253775)_3.html",
+"BABUJI AGENCIES (Code - 211840)_3.html",
+"BALAJI KISAN SEVA KENDRA (L-253) (Code - 209001)_3.html",
+"BALAJI PETRO PRODUCTS (L-71) (Code - 135486)_3.html",
+"BALAKRISHNA OIL FILLING STATION (Code - 254362)_3.html",
+"BANAM FILLING STATION (L-134) (Code - 135540)_3.html",
+"BATTULURI ADINARAYANA KSK (L-115) (Code - 268103)_3.html",
+"BHAGAVAN FILLING STATION (Code - 332850)_3.html",
+"BHANODAYA PETROLEUM PRODUCTS (L-14) (Code - 276646)_3.html",
+"BHAVANI FILLING STATION (Code - 348842)_3.html",
+"BKR FUELS (Code - 334435)_3.html",
+"BRAMHAIAH KSK FILLING STATION (Code - 328578)_3.html",
+"C.V.REDDY AGENCIES (L-54) (Code - 127722)_3.html",
+"CAUVERY FILLING STATION (L-141) (Code - 165848)_3.html",
+"CHANDRA AGENCIES (L-125) (Code - 198356)_3.html",
+"D.R.REDDY FSTN (L-98) (Code - 127794)_3.html",
+"D.VIMAL KUMAR AGENCIES (L-24) (Code - 258641)_3.html",
+"DEVIKA FILLING STATION (Code - 368503)_3.html",
+"DURGA SERVICE CENTRE (Code - 127500)_3.html",
+"DURGAM OIL FILLING CENTRE (Code - 243132)_3.html",
+"ESWAR OIL FILLING STATION (Code - 195794)_3.html",
+"FBM FILLING STATION (Code - 295641)_3.html",
+"FILMORE FUEL STATION (L-27) (Code - 188002)_3.html",
+"G.K.N KSK (Code - 296190)_3.html",
+"GANESH SAI KISAN SEVA KENDRA (L-78) (Code - 224250)_3.html",
+"GAYATHRI FILLING STATIOIN (L-129) (Code - 192650)_3.html",
+"GAYATHRI FILLING STATION (L-118) (Code - 243483)_3.html",
+"GENERAL AGENCIES - KADIRI (MHSKO) (Code - 134409)_3.html",
+"GENERAL AGENCIES (L-89 90) (Code - 153632)_3.html",
+"GENERAL MANAGERTTDTIRUMALA (Code - 509092)_3.html",
+"GENERAL MANAGERTTDTIRUPATI (Code - 126913)_3.html",
+"GIRI ASSOCIATES (L-124) (Code - 264066)_3.html",
+"GK FUELS (Code - 285020)_3.html",
+"GOWRI SANKAR FILLING STATION (Code - 153634)_3.html",
+"GOWTHAM FILLING STATION (Code - 251052)_3.html",
+"GPR FILLING STATION (Code - 127527)_3.html",
+"GRAMA PANCHAYATI RAITU AGENCY (Code - 280233)_3.html",
+"GURU SAI KISAN SEVA KENDRA (L-37) (Code - 265615)_3.html",
+"GVR FILLING STATION (Code - 354037)_3.html",
+"H_ PUR LORRY OWNERS ASSN (L-221) (Code - 134450)_3.html",
+"HARIPRIYA PETRO PLAZA (Code - 328362)_3.html",
+"HARSHA PETROLEUMS (Code - 269388)_4.html",
+"HARSHA VARDHAN FILLING STATION (Code - 334021)_3.html",
+"HYNDHAVI FILLING STATION (Code - 188101)_3.html",
+"INDIAN FILLING STATION - ADHOC PUNG (Code - 348969)_3.html",
+"INDIAN FILLING STATION (Code - 326695)_3.html",
+"JAANVI FUELS (Code - 366292)_3.html",
+"JAGAN MOHAN REDDY FILLING STATION (Code - 340357)_3.html",
+"JAMUNA FILLING STATION (Code - 195915)_3.html",
+"JAYARAJ AGENCIES (L - 228) (Code - 127497)_3.html",
+"K.N.R FILLING STATION (Code - 284531)_3.html",
+"K.R.FILLING STATION (L-114) (Code - 165847)_3.html",
+"KALYANI FILLING STATION (Code - 347310)_3.html",
+"KARUNA FILLING STATION (Code - 127526)_3.html",
+"KHWAJA GAREEBUN NAWAZ FUEL STATION (Code - 294212)_3.html",
+"KIRAN FILLING STATION (L-161) (Code - 199126)_3.html",
+"KODUR FILLING STATION (L-18 76) (Code - 153635)_3.html",
+"KOORAPATI SERV STN (L-45) (Code - 127703)_3.html",
+"KR BHUTTO FILLING STATION (Code - 341922)_3.html",
+"KRANTI FILLING STATION (L-44) (Code - 259557)_3.html",
+"KRISHIK AGENCIES (L-48 284) (Code - 127705)_3.html",
+"KRISHNAPATNAM FILLING STATION (Code - 259757)_3.html",
+"KWALITY AGENCIES (L-132) (Code - 127769)_3.html",
+"L.V.FILLING STATION (L-187 211) (Code - 183156)_3.html",
+"LAKSHMI FILLING STATION (Code - 333033)_3.html",
+"LAKSHMI GANAPATHI FILLING STATION (Code - 191712)_3.html",
+"LAKSHMI SRINIVASA FILLING STATION (Code - 328731)_3.html",
+"M.D.B.KSK (L - 23) (Code - 231827)_3.html",
+"M.R.REDDY KSK (L-281) (Code - 251053)_3.html",
+"M.S.REDDY & SONS (Code - 361625)_3.html",
+"MACHINENI FUELS (Code - 296708)_3.html",
+"MADEENA PETROL STATION (Code - 337865)_3.html",
+"MALIK KSK (L-53) (Code - 253093)_3.html",
+"MALLIKARJUNA KISAN SEVA KENDRA (Code - 213668)_3.html",
+"MARUTH FILLING STATION (L-230) (Code - 277534)_3.html",
+"MNMK PETROL FILLING STATION (Code - 269119)_3.html",
+"MS SRICHAKRA SERVICES (L-146) (Code - 210791)_3.html",
+"MURUGAN FUELS STATION (L-26) (Code - 258503)_3.html",
+"MVR FUELS (Code - 354385)_3.html",
+"MVS INDIANOIL SERVICE STATION (Code - 238136)_3.html",
+"N.R.FILLING STATION (Code - 284561)_3.html",
+"N.V.RAMANAIAH& CO (Code - 127623)_3.html",
+"NAGAVANI FILLING STATION (Code - 127718)_3.html",
+"NANJUNDESWARA PETROLEUMS (L-79) (Code - 193329)_3.html",
+"NIKHIL AGENCIES (L-94) (Code - 153637)_3.html",
+"NISITHA FILLING STATION (Code - 127683)_3.html",
+"OFFICE OF THE IGPPRINCIPAL (Code - 554137)_3.html",
+"OM SAI FILLING STATION (L-217) (Code - 217859)_3.html",
+"P M R FILLING STATION (Code - 339048)_3.html",
+"P R N FILLING STATION (Code - 313929)_3.html",
+"P V R FILLING STATION (Code - 338541)_3.html",
+"P.M.K.FILLING STATION (Code - 277362)_3.html",
+"P.M.R.FILLING STATION (KSK) (L-143) (Code - 239098)_3.html",
+"P.V.R.FILLING STATION (L - 4) (Code - 267149)_3.html",
+"PADMAJOTHI AGENCIES (Code - 333965)_3.html",
+"PENUBALA SER STN (L - 7) (Code - 127844)_3.html",
+"POLICE WELFARE IOCL FILLING STATION (Code - 366338)_3.html",
+"PONNU MNM PETRO STATION (Code - 323680)_3.html",
+"PRANAY KSK (L-178) (Code - 264353)_3.html",
+"PSR PANCHETI OIL FILLING STATION (Code - 286651)_3.html",
+"R K FILLING STATION (Code - 331502)_4.html",
+"R.K.R.FUELS (Code - 188092)_3.html",
+"RAGHU FILLING STATION (Code - 328489)_3.html",
+"RAJA RAJESWARI QUALITY FUELS (Code - 268066)_3.html",
+"RAJESWARI FUELS (Code - 188044)_3.html",
+"RAJYALAKSHMI RURAL FSTN -KSK (Code - 282723)_3.html",
+"RAMAKRISHNA AGENCIES (L-41) (Code - 127649)_3.html",
+"RAMAKRISHNA REDDY AGENCIES (L-133) (Code - 127670)_3.html",
+"RAMGAMS FUEL STATION (Code - 334835)_3.html",
+"RAMKI FUELS (L-40) (Code - 248438)_3.html",
+"RAMYA FILLING STATION (Code - 297694)_3.html",
+"RCR_S FILLING STATION (L-113) (Code - 250079)_3.html",
+"REDDY & REDDY AGENCIES (L- 35) (Code - 127627)_3.html",
+"REVENUE  FILLING STATION DARGAMITTA (Code - 366284)_3.html",
+"RK KISAN SEVA KENDRA (L-165) (Code - 193886)_3.html",
+"ROSHAN  FILLING STATION (Code - 346859)_3.html",
+"RR PETROL PUMP (Code - 329210)_3.html",
+"S A ISMAIL & CO. V.KOTA (L-186) (Code - 188481)_3.html",
+"S F QUALITY FUELS (L-268) (Code - 277538)_3.html",
+"S.G.M.KSK (Code - 263380)_3.html",
+"S.L.V FILLINGS (Code - 345699)_3.html",
+"S.P.S AGENCIES (L-12) (Code - 127815)_3.html",
+"S.R.FUEL STATION KSK (Code - 310490)_3.html",
+"S.V.FUEL AGENCIES (L-38) (Code - 257145)_3.html",
+"S.V.KSK (Code - 262229)_3.html",
+"SAI HITESH FILLING STATION (L-106) (Code - 135475)_3.html",
+"SAI MEGHANA KISAN SEVA KENDRA (Code - 223641)_3.html",
+"SAI NIKHIL FILLING STATION (L-283) (Code - 280162)_3.html",
+"SAI QUALITY FILLING STATION (Code - 336669)_3.html",
+"SAI SAKETH CO (Code - 127681)_3.html",
+"SAI SREENIVASA KISAN SEVA KENDRA (Code - 234472)_3.html",
+"SAPTAGIRI SERVICE STATIONTIRUPATI (Code - 153638)_3.html",
+"SAPTHAGIRI OIL FILLING STATION (Code - 127684)_3.html",
+"SARVAMANGALA KSK (L-100) (Code - 254925)_3.html",
+"SEKHAR KSK (L-160) (Code - 248890)_3.html",
+"SEVEN HILLS FILLING STATION (Code - 292408)_3.html",
+"SHAYAN KISAN SEVA KENDRA (Code - 288888)_3.html",
+"SHIRDI SAI FS (KSK) (Code - 251858)_3.html",
+"SHIVA FILLING STATION (L-128) (Code - 188295)_3.html",
+"SHIVA SHAKTHI PETROLEUMS (Code - 280247)_3.html",
+"SHREE HARIHARA_S SERVICE STN (L-99) (Code - 219976)_3.html",
+"SHREE RANGASWAMY KSK (L-60) (Code - 240577)_3.html",
+"SHRI VENKATESWARA GANGAMMA FS (Code - 325089)_3.html",
+"SIDDHARTH RAO AGENCIES (Code - 334169)_3.html",
+"SIRI SRINIVASA FILLING STATION (Code - 249818)_3.html",
+"SIRISH FUELS (Code - 314092)_3.html",
+"SIVA SAKTHI FUELS (Code - 323197)_3.html",
+"SK MOHAMMAD NIYAS FILLING STATION (Code - 267170)_3.html",
+"SMS LIMITED (Code - 222208)_3.html",
+"SOMASILA FILLING STATION (Code - 335788)_3.html",
+"SREE  KEERTHI  FUELS (L-68) (Code - 201927)_3.html",
+"SREE BALAJI AG.(RAYACHOTY) (Code - 127693)_3.html",
+"SREE LAKSHMI NARASIMHASWAMY FS (Code - 273956)_3.html",
+"SREE MANJUNATH FILLING STATION (Code - 326678)_3.html",
+"SREE PADMAVATHI SERVICE STATION (Code - 208143)_3.html",
+"SREE SAIBABA AGENCIES (Code - 127716)_3.html",
+"SREE SAPTHAGIRI FUELS (L-43) (Code - 267362)_3.html",
+"SREENIVASA PETRO PRODUCTS (L - 3) (Code - 153639)_3.html",
+"SRI BALAJI AGENCIES (CDP) (L-138) (Code - 127694)_3.html",
+"SRI BALAJI FILL STN TIRUMALA (Code - 127781)_3.html",
+"SRI BALAJI OIL AGENCIES CHITTOOR (Code - 187999)_3.html",
+"SRI CHINTALAMMA PETROL BUNK (Code - 344224)_3.html",
+"SRI DURGA KISAN SEVA KENDRA (L - 1) (Code - 223415)_3.html",
+"SRI GANESHA KISAN SEVAKENDRAMU (Code - 214621)_3.html",
+"SRI GOVINDA FILLING STATION (Code - 253096)_3.html",
+"SRI HANUMAN FILLING STATION (Code - 289993)_3.html",
+"SRI JYOTHEESWRI KSK (L-130 145) (Code - 264018)_3.html",
+"SRI KARUN FILLING STATION (L-180) (Code - 135532)_3.html",
+"SRI LAKSHMI BALAJI FILLING STATION (Code - 341365)_4.html",
+"SRI LAKSHMI NARASIMHA KSK (L-52) (Code - 251849)_3.html",
+"SRI LAKSHMI PRASANNA (L-148) (Code - 127786)_3.html",
+"SRI LAKSHMI SRINIVASA AGENCIES (Code - 153641)_3.html",
+"SRI LAKSHMI VENKATESHWARA KSK FILLI (Code - 339011)_3.html",
+"SRI LAKSHMI VENKATESWARA FS (Code - 224458)_3.html",
+"SRI LAKSHMI VENKATESWARA FS (Code - 249811)_3.html",
+"SRI LAKSHMIGANAPATHY FUELS (Code - 248439)_3.html",
+"SRI LAKSHMINARAYANA FSTN (L-140) (Code - 238141)_3.html",
+"SRI MALLIKARJUNA TRADERS (KSK) (Code - 251855)_3.html",
+"SRI MARUTHY AGENCIES (L-83 84) (Code - 127675)_3.html",
+"SRI MUNIESWARA FILLING STATION (Code - 310626)_3.html",
+"SRI MUNIVEL FILLING STATION (Code - 282724)_3.html",
+"SRI MYLAR LINGASWAMY FILLING STATIO (Code - 334837)_3.html",
+"SRI NANDA FILLING STATION (Code - 337808)_3.html",
+"SRI NARASIMHA AGENCIES (L-120) (Code - 259755)_3.html",
+"SRI NIDHI OIL FILLING STATION (Code - 324355)_3.html",
+"SRI P.M.R.AGENCIES (L-96) (Code - 204295)_3.html",
+"SRI PARVATHI PARAMESWARA AGENC (Code - 196837)_3.html",
+"SRI PCN FILLING STATION (Code - 307923)_3.html",
+"SRI R.R.FUELS (L-258) (Code - 272780)_3.html",
+"SRI RAGHAVENDRA FILLING STATION (Code - 367799)_3.html",
+"SRI RAM FUEL CENTRE (L-127) (Code - 153642)_3.html",
+"SRI RAMA KISHAN SEVA KENDRA (Code - 215647)_3.html",
+"SRI RAMAKRISHNA SERVICE STN (L-142) (Code - 225291)_3.html",
+"SRI RANGANATHA FSTATION (L-144) (Code - 153643)_3.html",
+"SRI RENUKA AGENCIES (Code - 213690)_3.html",
+"SRI SAI BALAJI AGENCIES KSK (Code - 305212)_3.html",
+"SRI SAI BALAJI KSK (Code - 283330)_3.html",
+"SRI SAI FILLING STATION (L-226) (Code - 199139)_3.html",
+"SRI SAI KISAN SEVA KENDRA (L-254) (Code - 223407)_3.html",
+"SRI SAI RAM FILLING STATION (Code - 189135)_3.html",
+"SRI SAI SERVICE STN (L - 21) (Code - 127848)_3.html",
+"SRI SAI SREENIVASA KSK (Code - 268081)_3.html",
+"SRI SAIRAM FUELS (Code - 200995)_3.html",
+"SRI SAPTHAGIRI OIL FCENTRE (L-64) (Code - 244670)_3.html",
+"SRI SATYA SAI OIL FILLING STATION (Code - 127841)_3.html",
+"SRI SESHA SAI TRADERS (KSK) (L-137) (Code - 251857)_3.html",
+"SRI SHIRDI SAI FILLING STATION (Code - 286580)_3.html",
+"SRI SHIRIDI SAI FILLING STATION (Code - 355477)_3.html",
+"SRI SHIRIDI SAI FILLING STN. (L-9) (Code - 153645)_3.html",
+"SRI SIDDESWARA FILLING STATION (Code - 331426)_3.html",
+"SRI SKANDESHWARA FUELS (Code - 335420)_3.html",
+"SRI SRIDHAR SERVICES (L-16) (Code - 203847)_3.html",
+"SRI SRINIVASA FILLING STATION (Code - 243482)_3.html",
+"SRI SRINIVASA FS V.KOTA (Code - 127846)_3.html",
+"SRI SRINIVASA KSK (L-15 154) (Code - 265257)_3.html",
+"SRI SWARNA SAI FILLING STATION (Code - 268064)_3.html",
+"SRI TIRUMALA FILLING STATION (Code - 347473)_3.html",
+"SRI U. BRAHMAIAH FSTN (L-116) (Code - 153646)_3.html",
+"SRI VARASIDDI VINAYAKA POLICE WELFA (Code - 362432)_3.html",
+"SRI VARASIDDI VINIAYAKA AGEN (L-8) (Code - 203845)_3.html",
+"SRI VEERA BRAMHENDRA FUELS (Code - 279751)_3.html",
+"SRI VEERABHADRA SWAMY FILLING STATI (Code - 339008)_3.html",
+"SRI VENKAIAH SWAMY FILLING STATION (Code - 225686)_3.html",
+"SRI VENKATESWARA FILLING STATION (Code - 352043)_3.html",
+"SRI VENKATESWARA FILLING STN (L-5) (Code - 204280)_3.html",
+"SRI VENKATESWARA FUELS (Code - 269310)_3.html",
+"SRI VIGNESWARA FILLING STATION (Code - 212948)_3.html",
+"SRI VIJAYA DURGA OIL FILLING STN. (Code - 180606)_3.html",
+"SRI VIJAYA DURGA SERVICE STATION (Code - 153574)_3.html",
+"SRI VIJAYALAKSHMI AGENCIES (Code - 195928)_3.html",
+"SRI VIJAYALAKSHMI FILLING STAT (Code - 182211)_3.html",
+"SRI VIJAYALAKSHMI FILLING STATION- (Code - 367489)_3.html",
+"SRI VINAYAKA FUELS (L-168) (Code - 256446)_3.html",
+"SRIKRISHNA FILLING STATION (L-91) (Code - 273949)_3.html",
+"SRINIVASA FILLING STATION (L-191) (Code - 263378)_3.html",
+"SRIRAM SIR FILLING STATION (Code - 323622)_3.html",
+"SRIRAMA FILLING STATION (Code - 259758)_3.html",
+"SUBHA FILLING STATION RENIGUNTA (Code - 153657)_3.html",
+"SUBHA FILLING STN MALLAVARAM (Code - 127738)_3.html",
+"SUJANA RAO FILLING STATION (L - 6) (Code - 225285)_3.html",
+"SUJITH FUEL STATION (Code - 275262)_3.html",
+"SUJITH FUEL STATION ADHOC (Code - 341114)_3.html",
+"SUNDARAJ G. (L-104) (Code - 153648)_4.html",
+"SUNDARAJ G. (L-104) (Code - 153648)_5.html",
+"T.N.NAGI REDDY & CO (L-126) (Code - 127713)_3.html",
+"TAHAR ENTERPRISES (L-135) (Code - 187998)_3.html",
+"THE BHATTIPROLU FILLING STATION ADH (Code - 367129)_3.html",
+"THE POLICE WELFARE IOC F.STATION (Code - 310501)_3.html",
+"THE POLICE WELFARE IOC FILLING STN (Code - 309929)_3.html",
+"THE POLICE WELLFARE IOCL F STN. (Code - 311374)_3.html",
+"THE PRINCIPAL AP STARS NELLORE (Code - 350364)_3.html",
+"THE SUPERINTENDENT (L-264) (Code - 249391)_3.html",
+"THIRUMALA OIL FILLING AGENC (L-13) (Code - 270981)_3.html",
+"TIRUMALA OIL DISTROBUTORS TIRUPATI (Code - 127790)_3.html",
+"TIRUMALA SERVICE STN (L-39) (Code - 153650)_3.html",
+"USHA FILLING STATION (Code - 332051)_3.html",
+"V.KRISHNA REDDY & SONS (L-92) (Code - 127734)_3.html",
+"V.LAKSHMAN & SONS (L-119) (Code - 127721)_3.html",
+"V.S.VENKATAMUNI (L-19 20) (Code - 127747)_3.html",
+"V.S.VENKATAMUNI FILLING STN (L-25) (Code - 221851)_3.html",
+"VANDAVASI SREE SHANKAR FILLING STAT (Code - 348790)_3.html",
+"VELLALA SANJEEVARAYA KSK (Code - 292201)_3.html",
+"VENKAIAH SWAMY KSK (Code - 251856)_3.html",
+"VENKATADRI KISAN SEVA KENDRA (Code - 219431)_3.html",
+"VIJAYASIMHA SERVICE STATION (Code - 292397)_3.html",
+"VIKRAM FUEL STATION (L-10) (Code - 188007)_3.html",
+"VIKRAM PETROLEUMS (L-11) (Code - 264347)_3.html",
+"VIRUPAKSHA FUELS (Code - 326933)_3.html",
+"VISHNU PADMAVATY RELIABLE AG(L-31) (Code - 188004)_3.html",
+"VISHNU RELIABLE AGENCY (L-29 30) (Code - 188006)_3.html",
+"VIVEKANANDA KSK (L-251) (Code - 255688)_3.html",
+"VKRR FUEL STATION (Code - 325087)_3.html",
 
-      const angle = toDegrees((bearing2 - bearing1 + 2 * Math.PI) % (2 * Math.PI));
-      return angle > 180 ? 360 - angle : angle;
-    }
+            // Add all other route file names here...
+        ];
 
-    for (let i = 1; i < routeCoordinates.length - 1; i++) {
-      const angle = calculateAngle(
-        routeCoordinates[i - 1],
-        routeCoordinates[i],
-        routeCoordinates[i + 1]
-      );
+        // Generate the route list
+        const routeList = document.getElementById('routeList');
+        routes.forEach(route => {
+            const listItem = document.createElement('li');
+            listItem.className = 'route-item';
 
-      if (angle < 90) {
-        L.marker(routeCoordinates[i], {
-          icon: L.divIcon({
-            className: 'sharp-turn',
-            html: `&#x26A0; ${angle.toFixed(1)}°`
-          })
-        }).addTo(map);
-      }
-    }
+            const link = document.createElement('a');
+            link.href = route;
+            link.target = '_blank';
+            link.textContent = route.replace('.html', '');
 
-    map.fitBounds(route.getBounds());
-  </script>
+            listItem.appendChild(link);
+            routeList.appendChild(listItem);
+        });
+
+        // Search Functionality
+        const searchBox = document.getElementById('searchBox');
+        searchBox.addEventListener('input', () => {
+            const query = searchBox.value.toLowerCase();
+            const items = routeList.getElementsByClassName('route-item');
+
+            Array.from(items).forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query) ? 'block' : 'none';
+            });
+        });
+    </script>
+
 </body>
 </html>
