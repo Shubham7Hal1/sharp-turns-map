@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script>
+        L_NO_TOUCH = false;
+        L_DISABLE_3D = false;
+    </script>
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+</head>
+<body>
+    <div id="map" ></div>
+    <script>
+        var map = L.map('map', {
+            center: [22.082268, 88.035415],
+            zoom: 12,
+            zoomControl: true,
+        });
+
+        // Adding base layers
+        var osmLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
+        }).addTo(map);
+
+        // Adding a marker for Vinayak Petroleum
+        var marker = L.marker([22.082268, 88.035415]).addTo(map);
+        marker.bindPopup("<b>Vinayak Petroleum</b><br>Code: 0000324191<br>Latitude: 22.082268<br>Longitude: 88.035415").openPopup();
+
+        // Adding sharp turn detection
+        var riskGroup = L.featureGroup().addTo(map);
+
+        var routeCoordinates = [
+            [22.0835, 88.0360],
+            [22.082268, 88.035415],
+            [22.0815, 88.0350]
+        ];
+
+        // Draw the route
+        var polyline = L.polyline(routeCoordinates, { color: 'blue', weight: 3 }).addTo(map);
+
+        // Identify sharp turns
+        function calculateAngle(latlng1, latlng2, latlng3) {
+            const toRadians = (deg) => deg * (Math.PI / 180);
+            const toDegrees = (rad) => rad * (180 / Math.PI);
+
+            const bearing1 = Math.atan2(
+                Math.sin(toRadians(latlng2[1] - latlng1[1])) * Math.cos(toRadians(latlng2[0])),
+                Math.cos(toRadians(latlng1[0])) * Math.sin(toRadians(latlng2[0])) -
+                  Math.sin(toRadians(latlng1[0])) * Math.cos(toRadians(latlng2[0])) *
+                  Math.cos(toRadians(latlng2[1] - latlng1[1]))
+            );
+
+            const bearing2 = Math.atan2(
+                Math.sin(toRadians(latlng3[1] - latlng2[1])) * Math.cos(toRadians(latlng3[0])),
+                Math.cos(toRadians(latlng2[0])) * Math.sin(toRadians(latlng3[0])) -
+                  Math.sin(toRadians(latlng2[0])) * Math.cos(toRadians(latlng3[0])) *
+                  Math.cos(toRadians(latlng3[1] - latlng2[1]))
+            );
+
+            const angle = toDegrees((bearing2 - bearing1 + 2 * Math.PI) % (2 * Math.PI));
+            return angle > 180 ? 360 - angle : angle;
+        }
+
+        for (let i = 1; i < routeCoordinates.length - 1; i++) {
+            const angle = calculateAngle(
+                routeCoordinates[i - 1],
+                routeCoordinates[i],
+                routeCoordinates[i + 1]
+            );
+
+            if (angle < 90) {
+                L.marker(routeCoordinates[i], {
+                    icon: L.AwesomeMarkers.icon({
+                        icon: "exclamation", markerColor: "red", prefix: "fa"
+                    })
+                }).bindPopup(`<b>Sharp Turn</b><br>Angle: ${angle.toFixed(1)}°<br>Recommended Speed: 10-15 km/hr`).addTo(riskGroup);
+            }
+        }
+
+        map.fitBounds(riskGroup.getBounds());
+    </script>
+</body>
+</html>
