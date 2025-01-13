@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sharp Turns & Narrow Angles</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+    .sharp-turn {
+      background-color: red;
+      color: white;
+      padding: 2px 5px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    const map = L.map('map').setView([22.5, 87.7], 8);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Coordinates of the routes
+    const routes = [
+      { name: "VPS Stone crusher", coords: [25.451642, 78.293128] },
+      { name: "VINAYAK PETROLEUM", coords: [22.082268, 88.035415] },
+      { name: "VETERAN COPRIVATE LIMITED ADHOC", coords: [22.0664, 88.0724] },
+      { name: "VETERAN CO PVT LTD", coords: [22.055158, 88.106343] },
+      { name: "Varaha Infra Ltd", coords: [16.719198, 81.040097] }
+    ];
+
+    // Add markers and analyze sharp angles for each route
+    routes.forEach(route => {
+      const marker = L.marker(route.coords).addTo(map);
+      marker.bindPopup(`<b>${route.name}</b>`);
+    });
+
+    // Fit map to show all routes
+    const bounds = routes.map(route => route.coords);
+    map.fitBounds(bounds);
+  </script>
+</body>
+</html>
